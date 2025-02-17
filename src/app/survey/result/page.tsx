@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DimensionChart } from "./components/DimensionChart"
 import { ResultDescription } from "./components/ResultDescription"
 import { calculateDimensionScores, determineResultType } from "@/utils/scoreCalculator"
-import type { ResultType } from "@/types/survey"
+import { ResultType, ResultTypeDisplay } from "@/types/survey"
 import { useAtom } from 'jotai'
 import { surveyStateAtom } from '@/store/survey'
 import {
@@ -35,6 +35,38 @@ export default function ResultPage() {
   const [warningMessage, setWarningMessage] = useState("")
 
   useEffect(() => {
+    const saveResponseToDB = async (result: SurveyResult) => {
+      try {
+        const response = {
+          teamName: surveyState.user?.teamName,
+          userName: surveyState.user?.name,
+          answers: surveyState.answers,
+          dimensionScores: {
+            communication: result.dimensionScores.Communication,
+            strictness: result.dimensionScores.Strictness,
+            qualityFocus: result.dimensionScores.QualityFocus,
+            deadlineFocus: result.dimensionScores.DeadlineFocus,
+            teamFocus: result.dimensionScores.TeamFocus,
+          },
+          resultType: result.type,
+        };
+
+        const res = await fetch('/api/survey/response', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(response),
+        });
+
+        if (!res.ok) throw new Error('Failed to save response');
+        
+        console.log('Response saved successfully');
+      } catch (error) {
+        console.error('Error saving response:', error);
+      }
+    };
+
     try {
       if (!surveyState.user) {
         setWarningMessage("설문 참여자 정보가 없습니다.")
@@ -51,11 +83,14 @@ export default function ResultPage() {
       const dimensionScores = calculateDimensionScores(surveyState.answers)
       const type = determineResultType(dimensionScores)
       
-      setResult({
+      const result = {
         type,
         dimensionScores,
         surveyUser: surveyState.user
-      })
+      }
+
+      setResult(result)
+      saveResponseToDB(result)
     } catch (error) {
       console.error("Error calculating result:", error)
       setWarningMessage("결과 계산 중 오류가 발생했습니다.")
@@ -129,14 +164,5 @@ export default function ResultPage() {
 }
 
 function getResultType(type: ResultType): string {
-  const typeMap = {
-    ChillGuy: "Chill Guy",
-    MeticulousReviewer: "깐깐한 리뷰어",
-    BugHunter: "버그 헌터",
-    CommunicationOverloader: "소통 폭주기관차",
-    SprintWarrior: "스프린트 전사",
-    TeamBuffer: "팀워크 버퍼",
-    SilentArtisan: "고독한 장인"
-  }
-  return typeMap[type]
-} 
+  return ResultTypeDisplay[type] || type;
+}

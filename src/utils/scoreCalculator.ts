@@ -1,4 +1,5 @@
-import { Answer, Dimension, ResultType } from '../types/survey'
+import { Answer, Dimension, ResultType, IDimensionScores } from '../types/survey'
+import { calculateScoreForQuestion } from './questionScoring'
 
 export const calculateDimensionScores = (answers: Record<number, Answer>): Record<Dimension, number> => {
   const scores: Record<Dimension, number> = {
@@ -11,66 +12,12 @@ export const calculateDimensionScores = (answers: Record<number, Answer>): Recor
 
   Object.entries(answers).forEach(([questionId, answer]) => {
     const qId = parseInt(questionId)
-    const numericAnswer = Number(answer)
+    const questionScores = calculateScoreForQuestion(qId, answer)
     
-    switch(qId) {
-      case 1: // 코드 리뷰 꼼꼼도
-        scores.Strictness += numericAnswer * 1.5
-        break
-      case 2: // 메신저 응답
-        scores.Communication += numericAnswer * 1.5
-        break
-      case 3: // 새 기술 도입 시 팀원 의견
-        scores.TeamFocus += numericAnswer * 0.8
-        scores.QualityFocus += numericAnswer * 0.3
-        break
-      case 4: // 협업 중요 요소 (다중선택)
-        if (Array.isArray(answer)) {
-          answer.forEach(choice => {
-            const score = Number(choice)
-            if (score === 1) scores.DeadlineFocus += 1.5
-            if (score === 2) scores.TeamFocus += 1
-            if (score === 3) scores.QualityFocus += 1.5
-            if (score === 4) scores.DeadlineFocus += 1
-            if (score === 5) scores.TeamFocus += 1.5
-          })
-        }
-        break
-      case 5: // 버그 대응
-        scores.QualityFocus += numericAnswer * 1.5
-        if (numericAnswer <= 2) scores.DeadlineFocus += 1.5
-        break
-      case 6: // 데드라인
-        scores.DeadlineFocus += numericAnswer * 0.8
-        break
-      case 7: // 코드 리뷰 항목 (다중선택)
-        if (Array.isArray(answer)) {
-          answer.forEach(choice => {
-            const score = Number(choice)
-            if (score <= 2) scores.Strictness += 0.8
-            if (score >= 3) scores.QualityFocus += 0.8
-          })
-        }
-        break
-      case 8: // 미팅 발언
-        scores.Communication += numericAnswer * 1.5
-        break
-      case 9: // 페어 프로그래밍
-        scores.Communication += numericAnswer * 0.8
-        scores.TeamFocus += numericAnswer * 0.8
-        break
-      case 10: // 품질 vs 일정
-        scores.QualityFocus += numericAnswer * 1.5
-        scores.DeadlineFocus += (6 - numericAnswer) * 1.5
-        break
-      case 11: // 의견 수용도
-        scores.TeamFocus += numericAnswer * 1.5
-        break
-      case 12: // 갈등 해소
-        scores.TeamFocus += numericAnswer * 1.5
-        scores.Communication += numericAnswer * 0.8
-        break
-    }
+    // 각 차원별 점수 누적
+    Object.entries(questionScores).forEach(([dimension, score]) => {
+      scores[dimension as Dimension] += score
+    })
   })
 
   // 디버깅을 위한 로그 추가
@@ -89,7 +36,7 @@ export const determineResultType = (scores: Record<Dimension, number>): ResultTy
     scores.DeadlineFocus < 15
 
   if (isChillGuy) {
-    return "ChillGuy"
+    return ResultType.ChillGuy
   }
 
   // 최고점 차원 찾기
@@ -100,12 +47,23 @@ export const determineResultType = (scores: Record<Dimension, number>): ResultTy
 
   // 단일 최고점 기준 매핑
   const typeMap: Record<Dimension, ResultType> = {
-    Communication: "CommunicationOverloader",
-    Strictness: "MeticulousReviewer",
-    QualityFocus: "BugHunter",
-    DeadlineFocus: "SprintWarrior",
-    TeamFocus: "TeamBuffer"
+    Communication: ResultType.CommunicationOverloader,
+    Strictness: ResultType.MeticulousReviewer,
+    QualityFocus: ResultType.BugHunter,
+    DeadlineFocus: ResultType.SprintWarrior,
+    TeamFocus: ResultType.TeamBuffer
   };
 
-  return typeMap[dominantDimensions[0]] || "ChillGuy";
-} 
+  return typeMap[dominantDimensions[0]] || ResultType.ChillGuy;
+}
+
+// MongoDB에 저장하기 위한 형식으로 변환하는 함수 추가
+export const convertToMongoDBFormat = (scores: Record<Dimension, number>): IDimensionScores => {
+  return {
+    communication: scores.Communication,
+    strictness: scores.Strictness,
+    qualityFocus: scores.QualityFocus,
+    deadlineFocus: scores.DeadlineFocus,
+    teamFocus: scores.TeamFocus,
+  };
+}; 
