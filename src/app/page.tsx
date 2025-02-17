@@ -29,8 +29,8 @@ export default function SurveyEntryPage() {
       return
     }
 
-    // localStorage에 사용자 정보 저장
-    localStorage.setItem(
+    // sessionStorage에 사용자 정보 저장
+    sessionStorage.setItem(
       "surveyUser",
       JSON.stringify({
         teamName,
