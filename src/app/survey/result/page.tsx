@@ -7,32 +7,31 @@ import { DimensionChart } from "./components/DimensionChart"
 import { ResultDescription } from "./components/ResultDescription"
 import { calculateDimensionScores, determineResultType } from "@/utils/scoreCalculator"
 import { ResultType, ResultTypeDisplay } from "@/types/survey"
-import { useAtom } from 'jotai'
-import { surveyStateAtom } from '@/store/survey'
 import { Button } from "@/components/ui/button"
+import { WarningModal } from "../[step]/components/WarningModal"
 
 interface SurveyResult {
   type: ResultType
   dimensionScores: Record<string, number>
   surveyUser: {
     name: string
+    teamName: string
   }
 }
 
 export default function ResultPage() {
   const router = useRouter()
-  const [surveyState] = useAtom(surveyStateAtom)
   const [result, setResult] = useState<SurveyResult | null>(null)
-  const [, setShowWarning] = useState(false)
-  const [, setWarningMessage] = useState("")
+  const [showWarning, setShowWarning] = useState(false)
+  const [warningMessage, setWarningMessage] = useState("")
 
   useEffect(() => {
     const saveResponseToDB = async (result: SurveyResult) => {
       try {
         const response = {
-          teamName: surveyState.user?.teamName,
-          userName: surveyState.user?.name,
-          answers: surveyState.answers,
+          teamName: result.surveyUser.teamName,
+          userName: result.surveyUser.name,
+          answers: result.dimensionScores,
           dimensionScores: {
             communication: result.dimensionScores.Communication,
             strictness: result.dimensionScores.Strictness,
@@ -60,35 +59,50 @@ export default function ResultPage() {
     };
 
     try {
-      if (!surveyState.user) {
-        setWarningMessage("설문 참여자 정보가 없습니다.")
+      const surveyUser = sessionStorage.getItem("surveyUser")
+      const surveyAnswers = sessionStorage.getItem("surveyAnswers")
+
+      if (!surveyUser || !surveyAnswers) {
+        setWarningMessage("설문에 참여하지 않았습니다.")
         setShowWarning(true)
         return
       }
 
-      if (Object.keys(surveyState.answers).length === 0) {
-        setWarningMessage("설문 응답 내역이 없습니다.")
-        setShowWarning(true)
-        return
-      }
-
-      const dimensionScores = calculateDimensionScores(surveyState.answers)
+      const user = JSON.parse(surveyUser)
+      const answers = JSON.parse(surveyAnswers)
+      
+      const dimensionScores = calculateDimensionScores(answers)
       const type = determineResultType(dimensionScores)
       
-      const result = {
+      const resultData = {
         type,
         dimensionScores,
-        surveyUser: surveyState.user
+        surveyUser: user
       }
 
-      setResult(result)
-      saveResponseToDB(result)
+      setResult(resultData)
+      saveResponseToDB(resultData)
     } catch (error) {
       console.error("Error calculating result:", error)
       setWarningMessage("결과 계산 중 오류가 발생했습니다.")
       setShowWarning(true)
     }
-  }, [surveyState, router])
+  }, [router])
+
+  const handleWarningClose = () => {
+    setShowWarning(false)
+    router.push("/")
+  }
+
+  if (showWarning) {
+    return (
+      <WarningModal
+        isOpen={showWarning}
+        onClose={handleWarningClose}
+        message={warningMessage}
+      />
+    )
+  }
 
   if (!result) return (
     <div className="flex items-center justify-center min-h-screen">

@@ -14,7 +14,7 @@ export const calculateDimensionScores = (answers: Record<number, Answer>): Recor
     const qId = parseInt(questionId)
     const questionScores = calculateScoreForQuestion(qId, answer)
     
-    // 각 차원별 점수 누적
+    // 각 항목별 점수 누적
     Object.entries(questionScores).forEach(([dimension, score]) => {
       scores[dimension as Dimension] += score
     })

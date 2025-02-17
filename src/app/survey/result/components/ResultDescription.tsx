@@ -35,12 +35,12 @@ export function ResultDescription({ type }: ResultDescriptionProps) {
 function getTypeDescription(type: ResultType): TypeDescription {
   const descriptions: Record<ResultType, TypeDescription> = {
     ChillGuy: {
-      title: "여유로운 긍정러 (Chill Guy)",
-      summary: "무난하고 긍정적인 태도로 팀의 분위기 메이커 역할을 합니다.",
+      title: "Chill Guy",
+      summary: "무난하고 긍정적인 태도로 팀을 관망합니다.",
       traits: [
         "꼭 필요한 것에만 집중하는 실용주의적 성향",
         "갈등 상황에서 중립적 입장 유지",
-        "유연한 태도로 팀 분위기를 부드럽게 만듦"
+        "유연한 태도로 관망"
       ]
     },
     MeticulousReviewer: {

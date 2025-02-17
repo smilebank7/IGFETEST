@@ -6,12 +6,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { SurveySkeleton } from "./components/SurveySkeleton"
 
 export default function SurveyEntryPage() {
   const router = useRouter()
   const [teamName, setTeamName] = useState("")
   const [name, setName] = useState("")
   const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleTeamNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setTeamName(e.target.value)
@@ -29,8 +31,10 @@ export default function SurveyEntryPage() {
       return
     }
 
-    // localStorage에 사용자 정보 저장
-    localStorage.setItem(
+    setIsLoading(true)
+
+    // sessionStorage에 사용자 정보 저장
+    sessionStorage.setItem(
       "surveyUser",
       JSON.stringify({
         teamName,
@@ -43,7 +47,9 @@ export default function SurveyEntryPage() {
     router.push("/survey/1")
   }, [teamName, name, router])
 
-  return (
+  return isLoading ? (
+    <SurveySkeleton />
+  ) : (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
@@ -74,8 +80,19 @@ export default function SurveyEntryPage() {
           {error && <p className="text-red-500 text-sm">{error}</p>}
         </CardContent>
         <CardFooter>
-          <Button className="w-full" onClick={handleStartSurvey}>
-            시작하기
+          <Button 
+            className="w-full" 
+            onClick={handleStartSurvey} 
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>설문 준비중...</span>
+              </div>
+            ) : (
+              "시작하기"
+            )}
           </Button>
         </CardFooter>
       </Card>
