@@ -24,7 +24,7 @@ export function DimensionChart({ scores }: DimensionChartProps) {
       data: {
         labels,
         datasets: [{
-          label: "차원별 점수",
+          label: "항목별 점수",
           data,
           backgroundColor: "rgba(37, 99, 235, 0.2)",
           borderColor: "rgba(37, 99, 235, 1)",

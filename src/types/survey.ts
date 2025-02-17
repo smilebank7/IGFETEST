@@ -48,7 +48,7 @@ export interface SurveyResult {
 }
 
 export const ResultTypeDisplay: Record<ResultType, string> = {
-  [ResultType.ChillGuy]: '여유로운 개발자',
+  [ResultType.ChillGuy]: 'Chill Guy',
   [ResultType.MeticulousReviewer]: '깐깐한 리뷰어',
   [ResultType.BugHunter]: '버그 헌터',
   [ResultType.CommunicationOverloader]: '소통 폭주기관차',
