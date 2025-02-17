@@ -8,6 +8,23 @@ export async function POST(req: Request) {
     
     const body = await req.json();
     
+    // 동일한 사용자의 중복 응답 체크
+    const existingResponse = await SurveyResponse.findOne({
+      teamName: body.teamName,
+      userName: body.userName,
+      // 1분 이내의 응답만 체크
+      createdAt: { 
+        $gte: new Date(Date.now() - 60 * 1000) // 1분 이내
+      }
+    });
+
+    if (existingResponse) {
+      return NextResponse.json({ 
+        message: '이미 제출된 응답입니다.',
+        data: existingResponse 
+      }, { status: 200 });
+    }
+
     const formattedBody = {
       ...body,
       answers: new Map(Object.entries(body.answers))

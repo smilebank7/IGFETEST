@@ -27,6 +27,12 @@ export default function ResultPage() {
 
   useEffect(() => {
     const saveResponseToDB = async (result: SurveyResult) => {
+      // 이미 저장되었는지 확인
+      const isAlreadySaved = sessionStorage.getItem("surveyResponseSaved")
+      if (isAlreadySaved === "true") {
+        return
+      }
+
       try {
         const response = {
           teamName: result.surveyUser.teamName,
@@ -52,6 +58,8 @@ export default function ResultPage() {
 
         if (!res.ok) throw new Error('Failed to save response');
         
+        // 저장 성공 시 플래그 설정
+        sessionStorage.setItem("surveyResponseSaved", "true")
         console.log('Response saved successfully');
       } catch (error) {
         console.error('Error saving response:', error);
