@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { ResultType } from '@/types/survey';
 
-interface ISurveyResponse extends Document {
+export interface ISurveyResponse extends Document {
   teamName: string;
   userName: string;
   answers: Map<string, string | string[] | number>;
@@ -56,7 +56,8 @@ const SurveyResponseSchema = new Schema<ISurveyResponse>({
 });
 
 // 이미 모델이 존재하는 경우 재사용, 없으면 새로 생성
-const SurveyResponse = mongoose.models.SurveyResponse || 
+const SurveyResponseModel = mongoose.models.SurveyResponse || 
   mongoose.model<ISurveyResponse>('SurveyResponse', SurveyResponseSchema);
 
-export default SurveyResponse; 
+export type SurveyResponse = ISurveyResponse;
+export default SurveyResponseModel; 
