@@ -9,14 +9,6 @@ import { calculateDimensionScores, determineResultType } from "@/utils/scoreCalc
 import { ResultType, ResultTypeDisplay } from "@/types/survey"
 import { useAtom } from 'jotai'
 import { surveyStateAtom } from '@/store/survey'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
 interface SurveyResult {
@@ -31,8 +23,8 @@ export default function ResultPage() {
   const router = useRouter()
   const [surveyState] = useAtom(surveyStateAtom)
   const [result, setResult] = useState<SurveyResult | null>(null)
-  const [showWarning, setShowWarning] = useState(false)
-  const [warningMessage, setWarningMessage] = useState("")
+  const [, setShowWarning] = useState(false)
+  const [, setWarningMessage] = useState("")
 
   useEffect(() => {
     const saveResponseToDB = async (result: SurveyResult) => {
@@ -98,34 +90,9 @@ export default function ResultPage() {
     }
   }, [surveyState, router])
 
-  const handleWarningClose = () => {
-    setShowWarning(false)
-    router.push("/")
-  }
-
   if (!result) return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-            <p className="text-lg text-gray-600">결과를 계산중입니다...</p>
-          </CardContent>
-        </Card>
-        <Dialog open={showWarning} onOpenChange={setShowWarning}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>안내</DialogTitle>
-              <DialogDescription>{warningMessage}</DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button onClick={handleWarningClose}>
-                처음으로 돌아가기
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
     </div>
   )
 
