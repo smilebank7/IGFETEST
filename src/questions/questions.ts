@@ -1,29 +1,7 @@
-// 설문 질문 타입 정의
+import { Question } from '../types/survey'
+
 export type QuestionType = "choice" | "score" | "multiChoice"
-
-export interface Question {
-  id: number
-  type: QuestionType
-  text: string
-  options?: Array<{
-    text: string
-    score: number
-  }>
-  multipleAllowed?: boolean
-}
-
-// 차원(Dimension) 정의
-export type Dimension = "Communication" | "Strictness" | "QualityFocus" | "DeadlineFocus" | "TeamFocus"
-
-// 결과 유형 정의
-export type ResultType = 
-  | "ChillGuy"
-  | "MeticulousReviewer" 
-  | "BugHunter"
-  | "CommunicationOverloader"
-  | "SprintWarrior"
-  | "TeamBuffer"
-  | "SilentArtisan"
+export { ResultType } from '../types/survey'
 
 // 샘플 질문 데이터
 export const questions: Question[] = [
@@ -161,88 +139,4 @@ export const questions: Question[] = [
   }
 ]
 
-export type Answer = string | string[] | number
-
-// 차원별 점수 계산 함수
-export const calculateDimensionScores = (answers: Record<number, Answer>): Record<Dimension, number> => {
-  const scores: Record<Dimension, number> = {
-    Communication: 0,
-    Strictness: 0,
-    QualityFocus: 0,
-    DeadlineFocus: 0,
-    TeamFocus: 0
-  }
-
-  // 각 질문별 차원 매핑 및 점수 계산
-  Object.entries(answers).forEach(([questionId, answer]) => {
-    const qId = parseInt(questionId)
-    
-    switch(qId) {
-      case 1: // 코드 리뷰 꼼꼼도
-        scores.Strictness += Number(answer) * 2
-        break
-      case 2: // 메신저 응답
-        scores.Communication += Number(answer) * 2
-        break
-      case 3: // 새 기술 도입
-        scores.TeamFocus += Number(answer)
-        break
-      case 4: // 협업 중요 요소
-        if (Array.isArray(answer)) {
-          const sum = answer.reduce((acc, curr) => acc + Number(curr), 0)
-          scores.TeamFocus += sum
-        }
-        break
-      case 5: // 버그 대응
-        scores.QualityFocus += Number(answer) * 2
-        break
-      case 6: // 데드라인
-        scores.DeadlineFocus += Number(answer)
-        break
-      case 7: // 코드 리뷰 항목
-        if (Array.isArray(answer)) {
-          const sum = answer.reduce((acc, curr) => acc + Number(curr), 0)
-          scores.Strictness += sum
-        }
-        break
-      case 8: // 미팅 발언
-        scores.Communication += Number(answer) * 2
-        break
-      case 9: // 페어 프로그래밍
-        scores.Communication += Number(answer)
-        scores.TeamFocus += Number(answer)
-        break
-      case 10: // 품질 vs 일정
-        const score = Number(answer)
-        scores.QualityFocus += score
-        scores.DeadlineFocus += (6 - score) // 역산
-        break
-      case 11: // 의견 수용도
-        scores.TeamFocus += Number(answer) * 2
-        break
-      case 12: // 갈등 해소
-        scores.TeamFocus += Number(answer) * 2
-        break
-    }
-  })
-
-  return scores
-}
-
-// 최종 유형 결정 함수
-export const determineResultType = (dimensionScores: Record<Dimension, number>): ResultType => {
-  // 간단한 로직 추가: 가장 높은 점수의 차원을 기준으로 유형 결정
-  const maxDimension = Object.entries(dimensionScores)
-    .sort(([,a], [,b]) => b - a)[0][0] as Dimension;
-
-  // 임시 매핑
-  const typeMap: Record<Dimension, ResultType> = {
-    Communication: "CommunicationOverloader",
-    Strictness: "MeticulousReviewer", 
-    QualityFocus: "BugHunter",
-    DeadlineFocus: "SprintWarrior",
-    TeamFocus: "TeamBuffer"
-  };
-
-  return typeMap[maxDimension] || "ChillGuy";
-}
+export type Answer = string | string[] | number;

@@ -5,7 +5,7 @@ interface ScoreQuestionProps {
   onChange: (value: number) => void
 }
 
-export function ScoreQuestion({ value = 5, onChange }: ScoreQuestionProps) {
+export function ScoreQuestion({ value = 0, onChange }: ScoreQuestionProps) {
   return (
     <div className="space-y-4">
       <Slider
