@@ -1,16 +1,7 @@
+import { Question } from '../types/survey'
+
 // 설문 질문 타입 정의
 export type QuestionType = "choice" | "score" | "multiChoice"
-
-export interface Question {
-  id: number
-  type: QuestionType
-  text: string
-  options?: Array<{
-    text: string
-    score: number
-  }>
-  multipleAllowed?: boolean
-}
 
 // 차원(Dimension) 정의
 export type Dimension = "Communication" | "Strictness" | "QualityFocus" | "DeadlineFocus" | "TeamFocus"
@@ -163,7 +154,7 @@ export const questions: Question[] = [
 
 export type Answer = string | string[] | number
 
-// 차원별 점수 계산 함수
+// 차원별 점수 계산 함수 수정
 export const calculateDimensionScores = (answers: Record<number, Answer>): Record<Dimension, number> => {
   const scores: Record<Dimension, number> = {
     Communication: 0,
@@ -173,55 +164,66 @@ export const calculateDimensionScores = (answers: Record<number, Answer>): Recor
     TeamFocus: 0
   }
 
-  // 각 질문별 차원 매핑 및 점수 계산
   Object.entries(answers).forEach(([questionId, answer]) => {
     const qId = parseInt(questionId)
+    const numericAnswer = Number(answer)
     
     switch(qId) {
       case 1: // 코드 리뷰 꼼꼼도
-        scores.Strictness += Number(answer) * 2
+        scores.Strictness += numericAnswer * 1.5
         break
       case 2: // 메신저 응답
-        scores.Communication += Number(answer) * 2
+        scores.Communication += numericAnswer * 1.5
         break
-      case 3: // 새 기술 도입
-        scores.TeamFocus += Number(answer)
+      case 3: // 새 기술 도입 시 팀원 의견
+        scores.TeamFocus += numericAnswer * 0.8
+        scores.QualityFocus += numericAnswer * 0.3
         break
-      case 4: // 협업 중요 요소
+      case 4: // 협업 중요 요소 (다중선택)
         if (Array.isArray(answer)) {
-          const sum = answer.reduce((acc, curr) => acc + Number(curr), 0)
-          scores.TeamFocus += sum
+          answer.forEach(choice => {
+            const score = Number(choice)
+            if (score === 1) scores.DeadlineFocus += 1.5
+            if (score === 2) scores.TeamFocus += 1
+            if (score === 3) scores.QualityFocus += 1.5
+            if (score === 4) scores.DeadlineFocus += 1
+            if (score === 5) scores.TeamFocus += 1.5
+          })
         }
         break
       case 5: // 버그 대응
-        scores.QualityFocus += Number(answer) * 2
+        scores.QualityFocus += numericAnswer * 1.5
+        if (numericAnswer <= 2) scores.DeadlineFocus += 1.5
         break
       case 6: // 데드라인
-        scores.DeadlineFocus += Number(answer)
+        scores.DeadlineFocus += numericAnswer * 0.8
         break
-      case 7: // 코드 리뷰 항목
+      case 7: // 코드 리뷰 항목 (다중선택)
         if (Array.isArray(answer)) {
-          const sum = answer.reduce((acc, curr) => acc + Number(curr), 0)
-          scores.Strictness += sum
+          answer.forEach(choice => {
+            const score = Number(choice)
+            if (score <= 2) scores.Strictness += 0.8
+            if (score >= 3) scores.QualityFocus += 0.8
+          })
         }
         break
       case 8: // 미팅 발언
-        scores.Communication += Number(answer) * 2
+        scores.Communication += numericAnswer * 1.5
         break
       case 9: // 페어 프로그래밍
-        scores.Communication += Number(answer)
-        scores.TeamFocus += Number(answer)
+        scores.Communication += numericAnswer * 0.8
+        scores.TeamFocus += numericAnswer * 0.8
         break
       case 10: // 품질 vs 일정
-        const score = Number(answer)
-        scores.QualityFocus += score
-        scores.DeadlineFocus += (6 - score) // 역산
+        scores.QualityFocus += numericAnswer * 1.5
+        scores.DeadlineFocus += (6 - numericAnswer) * 1.5
         break
       case 11: // 의견 수용도
-        scores.TeamFocus += Number(answer) * 2
+        scores.TeamFocus += numericAnswer * 1.5
         break
       case 12: // 갈등 해소
-        scores.TeamFocus += Number(answer) * 2
+        scores.TeamFocus += numericAnswer * 1.5
+        scores.Communication += numericAnswer * 0.8
         break
     }
   })
@@ -229,20 +231,62 @@ export const calculateDimensionScores = (answers: Record<number, Answer>): Recor
   return scores
 }
 
-// 최종 유형 결정 함수
-export const determineResultType = (dimensionScores: Record<Dimension, number>): ResultType => {
-  // 간단한 로직 추가: 가장 높은 점수의 차원을 기준으로 유형 결정
-  const maxDimension = Object.entries(dimensionScores)
-    .sort(([,a], [,b]) => b - a)[0][0] as Dimension;
+// 결과 타입 결정 함수 수정
+export const determineResultType = (scores: Record<Dimension, number>): ResultType => {
+  // Chill Guy 특별 판별 로직 - 임계값 조정
+  const isChillGuy = 
+    scores.Strictness < 12 && 
+    scores.TeamFocus < 15 && 
+    scores.Communication < 15 && 
+    scores.QualityFocus < 15 && 
+    scores.DeadlineFocus < 15;
 
-  // 임시 매핑
+  if (isChillGuy) {
+    return "ChillGuy";
+  }
+
+  // Silent Artisan 특별 판별 로직 - 임계값 조정
+  const isSilentArtisan = 
+    scores.QualityFocus > 20 && 
+    scores.Communication < 12;
+
+  if (isSilentArtisan) {
+    return "SilentArtisan";
+  }
+
+  // 나머지 유형은 가장 높은 점수를 기준으로 결정
+  const maxScore = Math.max(...Object.values(scores));
+  
+  // 최고점이 너무 낮으면 ChillGuy로 분류
+  if (maxScore < 15) {
+    return "ChillGuy";
+  }
+
+  const dominantDimensions = Object.entries(scores)
+    .filter(([, score]) => score === maxScore)
+    .map(([dimension]) => dimension as Dimension);
+
+  // 동점인 경우 우선순위 결정 - 임계값 조정
+  if (dominantDimensions.length > 1) {
+    if (dominantDimensions.includes("Strictness") && scores.QualityFocus > 15) {
+      return "MeticulousReviewer";
+    }
+    if (dominantDimensions.includes("QualityFocus") && scores.Strictness > 15) {
+      return "BugHunter";
+    }
+    if (dominantDimensions.includes("TeamFocus") && scores.TeamFocus > 15) {
+      return "TeamBuffer";
+    }
+  }
+
+  // 단일 최고점 기준 매핑
   const typeMap: Record<Dimension, ResultType> = {
     Communication: "CommunicationOverloader",
-    Strictness: "MeticulousReviewer", 
+    Strictness: "MeticulousReviewer",
     QualityFocus: "BugHunter",
     DeadlineFocus: "SprintWarrior",
     TeamFocus: "TeamBuffer"
   };
 
-  return typeMap[maxDimension] || "ChillGuy";
-}
+  return typeMap[dominantDimensions[0]];
+};
