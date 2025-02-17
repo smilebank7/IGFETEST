@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Question, Answer } from "@/questions/questions"
+import type { Question, Answer } from "@/types/survey"
 import { ChoiceQuestion } from "./ChoiceQuestion"
 import { ScoreQuestion } from "./ScoreQuestion"
 import { MultiChoiceQuestion } from "./MultiChoiceQuestion"
@@ -12,7 +12,9 @@ interface QuestionCardProps {
   answer: Answer
   onAnswerChange: (value: Answer) => void
   onNavigate: () => void
+  onPrevious: () => void
   isLastQuestion: boolean
+  isFirstQuestion: boolean
 }
 
 export function QuestionCard({
@@ -22,7 +24,9 @@ export function QuestionCard({
   answer,
   onAnswerChange,
   onNavigate,
-  isLastQuestion
+  onPrevious,
+  isLastQuestion,
+  isFirstQuestion
 }: QuestionCardProps) {
   const renderQuestion = () => {
     switch (question.type) {
@@ -65,7 +69,16 @@ export function QuestionCard({
         <p className="text-lg">{question.text}</p>
         {renderQuestion()}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex gap-3">
+        {!isFirstQuestion && (
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={onPrevious}
+          >
+            이전
+          </Button>
+        )}
         <Button className="w-full" onClick={onNavigate}>
           {isLastQuestion ? "완료" : "다음"}
         </Button>
