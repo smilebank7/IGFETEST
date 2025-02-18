@@ -3,7 +3,6 @@ import { Question } from '../types/survey'
 export type QuestionType = "choice" | "score" | "multiChoice"
 export { ResultType } from '../types/survey'
 
-// 샘플 질문 데이터
 export const questions: Question[] = [
   {
     id: 1,
