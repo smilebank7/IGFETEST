@@ -58,7 +58,7 @@ export function TeamDeviationChart({ responses }: Props) {
         plugins: {
           title: {
             display: true,
-            text: '팀별 표준편차 (팀 내 일관성)',
+            text: '팀별 표준편차',
           },
         },
       }}

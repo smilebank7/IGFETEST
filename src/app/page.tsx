@@ -70,9 +70,9 @@ export default function SurveyEntryPage() {
         <div className="w-full max-w-md">
           <Card className="mb-4">
             <CardHeader>
-              <CardTitle className="text-2xl text-center">개발자 협업 스타일 테스트</CardTitle>
+              <CardTitle className="text-2xl text-center">개발자 협업 스타일 설문</CardTitle>
               <CardDescription className="text-center">
-                테스트를 시작하기 전에 개인정보 수집에 동의해주세요.
+                설문을 시작하기 전에 개인정보 수집에 동의해주세요.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -90,7 +90,7 @@ export default function SurveyEntryPage() {
       <div className="w-full max-w-md">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl text-center">개발자 협업 스타일 테스트</CardTitle>
+            <CardTitle className="text-2xl text-center">개발자 협업 스타일 설문</CardTitle>
             <CardDescription className="text-center">
               팀 이름과 본인 이름을 입력해주세요.
             </CardDescription>
