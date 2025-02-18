@@ -22,7 +22,7 @@ export default function LoginPage() {
         id,
         password,
         redirect: false,
-        callbackUrl: "/admin"  // 로그인 성공 시 admin 페이지로 이동
+        callbackUrl: "/admin"
       })
 
       if (result?.error) {

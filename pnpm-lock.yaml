@@ -38,9 +38,6 @@ dependencies:
   clsx:
     specifier: ^2.1.1
     version: 2.1.1
-  jotai:
-    specifier: ^2.12.0
-    version: 2.12.0(@types/react@19.0.8)(react@19.0.0)
   lucide-react:
     specifier: ^0.475.0
     version: 0.475.0(react@19.0.0)
@@ -2781,22 +2778,6 @@ packages:
 
   /jose@4.15.9:
     resolution: {integrity: sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==}
-    dev: false
-
-  /jotai@2.12.0(@types/react@19.0.8)(react@19.0.0):
-    resolution: {integrity: sha512-j5B4NmUw8gbuN7AG4NufWw00rfpm6hexL2CVhKD7juoP2YyD9FEUV5ar921JMvadyrxQhU1NpuKUL3QfsAlVpA==}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      '@types/react': '>=17.0.0'
-      react: '>=17.0.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      react:
-        optional: true
-    dependencies:
-      '@types/react': 19.0.8
-      react: 19.0.0
     dev: false
 
   /js-tokens@4.0.0:
