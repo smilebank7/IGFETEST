@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/providers/SessionProvider"
@@ -39,14 +39,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '개발자 성향 설문조사',
     description: '12가지 질문으로 알아보는 나의 개발자 성향! 설문에 참여하고 나의 개발 스타일을 파악해보세요.',
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-  },
-  icons: {
-    icon: '/favicon.ico',
   },
 }
 
