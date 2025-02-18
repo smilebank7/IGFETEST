@@ -15,6 +15,7 @@
 - **UI Library**: shadcn/ui
 - **Authentication**: NextAuth.js
 - **Database**: MongoDB
+- **ORM**: Mongoose
 - **Styling**: Tailwind CSS
 
 ## 프로젝트 구조
@@ -28,7 +29,7 @@ src/
 ├── types/                 # 타입 정의
 ├── utils/                 # 유틸리티 함수
 ├── questions/             # 질문 데이터
-└── models/               # MongoDB 모델
+└── models/               # Mongoose 모델
 ```
 
 ## 주요 결과 유형
@@ -68,15 +69,15 @@ db.admins.insertOne({
 })
 ```
 
-2. MongoDB 연결 문자열 설정
+2. 환경 변수 설정
+```bash
+cp .sampleenv .env
+```
+
+3. MongoDB 연결 문자열 설정
 ```bash
 # .env 파일
 MONGODB_URI=mongodb://admin:password@localhost:27017/survey-db
-```
-
-3. 환경 변수 설정
-```bash
-cp .sampleenv .env
 ```
 
 4. 의존성 설치
