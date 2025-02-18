@@ -62,11 +62,13 @@ export default function AdminPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8 px-4">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-4xl mx-auto">
           <Card>
-            <CardContent className="flex flex-col items-center justify-center min-h-[400px]">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-              <p className="text-lg text-gray-600">데이터를 불러오는 중...</p>
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center justify-center min-h-[200px] gap-4">
+                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                <p className="text-gray-600">관리자 페이지 로딩 중...</p>
+              </div>
             </CardContent>
           </Card>
         </div>

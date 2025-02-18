@@ -13,9 +13,11 @@ export default function LoginPage() {
   const [id, setId] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
     
     try {
       const result = await signIn("credentials", {
@@ -32,6 +34,8 @@ export default function LoginPage() {
       }
     } catch {
       setError("로그인 중 오류가 발생했습니다.")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -64,8 +68,15 @@ export default function LoginPage() {
               />
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Button type="submit" className="w-full">
-              로그인
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  로그인 중...
+                </div>
+              ) : (
+                "로그인"
+              )}
             </Button>
           </form>
         </CardContent>
