@@ -1,0 +1,4 @@
+MONGODB_URI=mongodb://localhost:27017/survey-db
+NEXTAUTH_SECRET=your-nextauth-secret-key
+NEXTAUTH_URL=http://localhost:3000
+NEXT_PUBLIC_DEV_URL=http://localhost:3000 
